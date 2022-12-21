@@ -10,7 +10,8 @@ var DISCORD_WEBHOOKS = null;
 var APP_DEBUG = false;
 
 /** gasのpost関数 */
-function doPost(e) {
+function doPost(e)
+{
   APP_DEBUG = isNull(e);
 
   var sp = PropertiesService.getScriptProperties();
@@ -22,22 +23,26 @@ function doPost(e) {
 }
 
 /** メインの処理 */
-function main() {
+function main()
+{
   var spreadSheet = SpreadsheetApp.openById(SHEET_ID);
   var sheet = spreadSheet.getSheets().find(v => v.getSheetId() == SHEET_GID);
-  if (isNull(sheet)) {
+  if (isNull(sheet))
+  {
     return;
   }
 
   var actionArray = new Array();
   var range = sheet.getDataRange();
   var values = range.getValues();
-  
-  for (var i = 0; i < values.length; i++) {
+
+  for (var i = 0; i < values.length; i++)
+  {
     actionArray.push(values[i][0]);
   }
 
-  if (APP_DEBUG) {
+  if (APP_DEBUG)
+  {
     Logger.log(SHEET_ID);
     Logger.log(SHEET_GID);
     Logger.log(DISCORD_WEBHOOKS);
@@ -48,7 +53,8 @@ function main() {
   startMessage();
 
   // 検索コマンドを指定する
-  for (var i = 0; i < actionArray.length; i++) {
+  for (var i = 0; i < actionArray.length; i++)
+  {
     deleteGmails(actionArray[i]);
   }
 
@@ -56,9 +62,11 @@ function main() {
 }
 
 /** 指定コマンドで検索したメールを削除する処理 */
-function deleteGmails(actionStr) {
+function deleteGmails(actionStr)
+{
   var deleteThreads = GmailApp.search(actionStr);
-  if (isNull(deleteThreads) || deleteThreads.length == 0) {
+  if (isNull(deleteThreads) || deleteThreads.length == 0)
+  {
     return;
   }
 
@@ -68,7 +76,8 @@ function deleteGmails(actionStr) {
   postDiscordBOT(logStr);
 
   // 該当メールを全て削除
-  for (var i = 0; i < deleteThreads.length; i++) {
+  for (var i = 0; i < deleteThreads.length; i++)
+  {
     deleteThreads[i].moveToTrash();
   }
 
@@ -76,9 +85,10 @@ function deleteGmails(actionStr) {
   logStr += 'end deleteAction : ' + actionStr + ' done';
   postDiscordBOT(logStr);
 }
-  
+
 /** Discord API を実行する */
-function postDiscordBOT(str) {
+function postDiscordBOT(str)
+{
   // 投稿するチャット内容と設定
   var message = {
     "content": str, // チャット本文
@@ -89,18 +99,20 @@ function postDiscordBOT(str) {
     'headers': { 'Content-type': "application/json" },
     'payload': JSON.stringify(message)
   }
-  
+
   UrlFetchApp.fetch(DISCORD_WEBHOOKS, param);
   Utilities.sleep(SLEEP_TIME); // 0.3秒間の間に、連続でAPIを実行できないので待機処理
 }
 
-function startMessage() {
+function startMessage()
+{
   var logStr = STAMP_COFFEE + '\n';
   logStr += 'start DeleteGmails';
   postDiscordBOT(logStr);
 }
 
-function endMessage() {
+function endMessage()
+{
   var logStr = STAMP_COFFEE + '\n';
   logStr += 'end DeleteGmails\n';
   logStr += 'all done';
@@ -108,6 +120,7 @@ function endMessage() {
 }
 
 /** null */
-function isNull(value) {
+function isNull(value)
+{
   return value == null;
 }
